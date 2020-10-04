@@ -17,6 +17,7 @@ class StringToMatrix {
                 secondString[i] = firstString[i].split(" ");
             }
 
+
             if (4 != secondString.length){
                 throw new IndexOutOfBoundsException("Массив не равен 4х4");
             }
