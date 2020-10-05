@@ -2,7 +2,7 @@ package ru.grutsinav;
 
 import java.util.Objects;
 
-public class Person {
+public class Person<P> {
     private final String lastName;
     private final String telNumber;
     private final String eMail;
@@ -17,7 +17,12 @@ public class Person {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.lastName, identifier);
+        return Objects.hash(this.getLastName(), identifier);
+    }
+
+    @Override
+    public String toString() {
+        return getLastName();
     }
 
     public String getLastName() {

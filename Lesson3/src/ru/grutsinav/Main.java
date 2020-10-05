@@ -39,8 +39,8 @@ public class Main {
         System.out.println(phoneBook.getPhoneByLastName(LASTNAME[1]));
         System.out.println();
 
-        System.out.println("Поиск e-mail по фамилии: " + LASTNAME[1]);
-        System.out.println(phoneBook.getEmailByLastName(LASTNAME[1]));
+        System.out.println("Поиск e-mail по фамилии: " + LASTNAME[0]);
+        System.out.println(phoneBook.getEmailByLastName(LASTNAME[0]));
 
     }
 }

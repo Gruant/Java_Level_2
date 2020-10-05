@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PhoneBook {
-    HashMap<Person, ArrayList<String>> phonebook;
+    private HashMap<Person<String>, ArrayList<String>> phonebook;
 
     public PhoneBook() {
         this.phonebook = new HashMap<>();
@@ -27,7 +27,7 @@ public class PhoneBook {
     }
 
     public void getPhonebook() {
-        for (Person s : phonebook.keySet()) {
+        for (Person<String> s : phonebook.keySet()) {
             System.out.println(s.getLastName() + " : " + phonebook.get(s).get(0) +
                     " , " + phonebook.get(s).get(1));
         }
@@ -35,7 +35,7 @@ public class PhoneBook {
 
     public ArrayList<String> getPhoneByLastName(String lastname){
         ArrayList<String> telNumbers = new ArrayList<>();
-        for (Person s : phonebook.keySet()) {
+        for (Person<String> s : phonebook.keySet()) {
             if (s.getLastName().equalsIgnoreCase(lastname)){
                 telNumbers.add(s.getTelNumber());
             }
@@ -45,7 +45,7 @@ public class PhoneBook {
 
     public ArrayList<String> getEmailByLastName(String lastname){
         ArrayList<String> eMailNumbers = new ArrayList<>();
-        for (Person s : phonebook.keySet()) {
+        for (Person<String> s : phonebook.keySet()) {
             if (s.getLastName().equalsIgnoreCase(lastname)){
                 eMailNumbers.add(s.getEmail());
             }
