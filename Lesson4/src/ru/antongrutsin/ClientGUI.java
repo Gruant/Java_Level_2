@@ -109,11 +109,15 @@ public class ClientGUI extends JFrame implements ActionListener, KeyListener, Th
     }
 
     public void addTextToLog(){
-        if (!tfMessage.getText().replaceAll(" ","").equals("")) {
+        if (isNotEmptyMessage()) {
             log.append(tfMessage.getText() + "\n");
             //логируем запись
             logger.writeLog(tfMessage.getText());
             tfMessage.setText("");
         }
+    }
+
+    public boolean isNotEmptyMessage(){
+        return !tfMessage.getText().replaceAll(" ","").equals("");
     }
 }
