@@ -1,14 +1,14 @@
 package ru.antongrutsin;
 
+import com.sun.tools.javac.comp.Enter;
+import javafx.scene.input.KeyCode;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 
 
-public class ClientGUI extends JFrame implements ActionListener, KeyListener, Thread.UncaughtExceptionHandler {
+public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 300;
 
@@ -51,7 +51,12 @@ public class ClientGUI extends JFrame implements ActionListener, KeyListener, Th
         log.setEditable(false);
         scrollUser.setPreferredSize(new Dimension(150, 0));
         cbAlwaysOnTop.addActionListener(this);
-        tfMessage.addKeyListener(this);
+        tfMessage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addTextToLog();
+            }
+        });
         btnSend.addActionListener(this);
 
         panelTop.add(tfIPAddress);
@@ -76,25 +81,14 @@ public class ClientGUI extends JFrame implements ActionListener, KeyListener, Th
         Object src = e.getSource();
         if (src == cbAlwaysOnTop) {
             setAlwaysOnTop(cbAlwaysOnTop.isSelected());
-        } else if (src == btnSend){
+        }
+        if (src == btnSend){
             addTextToLog();
         } else {
-            throw new RuntimeException("Unknown source: " + src);
+            throw new RuntimeException("Not found: " + e);
         }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {}
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ENTER){
-            addTextToLog();
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
