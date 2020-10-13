@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 public class Main {
     static final int size = 10000000;
-    static final int h = size / 2;
 
     public static void main(String[] args){
         System.out.println("Время выполения метода без потоков: " + methodOne(fillArray(initArray(size)))
@@ -69,27 +68,6 @@ public class Main {
         System.arraycopy(arr2, 0, arr, arr1.length, arr2.length);
 
         return (System.currentTimeMillis() - a);
-    }
 
-    static class WorkerThread extends Thread {
-        float[] arr;
-        long a;
-        int index;
-
-        WorkerThread(float[] arr, int index, String name) {
-            super(name);
-            this.arr = arr;
-            this.index = index;
-            start();
-        }
-
-        @Override
-        public void run() {
-            a = System.currentTimeMillis();
-            for (int i = 0; i < arr.length; i++){
-                arr[i] = calcFormula(arr[i], index++);
-            }
-            System.out.printf("Время исполнения потока %s: %s мс \n", this.getName(), System.currentTimeMillis() - a);
-        }
     }
 }
