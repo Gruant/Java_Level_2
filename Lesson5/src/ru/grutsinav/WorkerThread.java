@@ -18,7 +18,8 @@ public class WorkerThread extends Thread{
     public void run() {
         a = System.currentTimeMillis();
         for (int i = 0; i < arr.length; i++){
-            arr[i] = calcFormula(arr[i], index++);
+            arr[i] = (float)(arr[i] * Math.sin(0.2f + (float)index / 5) * Math.cos(0.2f + (float)index / 5) *
+                    Math.cos(0.4f + (float)index / 2));
         }
         System.out.printf("Время исполнения потока %s: %s мс \n", this.getName(), System.currentTimeMillis() - a);
     }

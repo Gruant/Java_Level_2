@@ -28,7 +28,6 @@ public class Main {
     }
 
 
-
     public static long methodOne(float[] arr){
         long a;
 
