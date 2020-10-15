@@ -10,10 +10,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Vector;
 
 public class ChatServer implements ServerSocketThreadListener, SocketThreadListener {
     ServerSocketThread thread;
     private final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss: ");
+    private final Vector<SocketThread> usersThreads = new Vector<>();
 
     public void start(int port) {
         if (thread != null && thread.isAlive()) {
@@ -70,7 +72,8 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void onSocketAccepted(ServerSocketThread thread, ServerSocket server, Socket socket) {
         putLog("Client connected");
         String name = "SocketThread " + socket.getInetAddress() + ":" + socket.getPort();
-        new SocketThread(this, name, socket);
+        usersThreads.add(new SocketThread(this, name, socket));
+
 
     }
 
@@ -98,9 +101,14 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     }
 
+
+    //не успел проверить на нескольких клиентах
     @Override
     public synchronized void onReceiveString(SocketThread thread, Socket socket, String msg) {
-        thread.sendMessage("echo: " + msg);
+        for (SocketThread socketThread:
+             usersThreads) {
+            socketThread.sendMessage("echo: " + msg);
+        }
     }
 
     @Override
