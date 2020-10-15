@@ -32,12 +32,12 @@ public class SocketThread extends Thread {
                 listener.onReceiveString(this, socket, msg);
             }
         } catch (IOException e) {
-            listener.onSocketException(this, e);
+            e.printStackTrace();
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                listener.onSocketException(this, e);
+                e.printStackTrace();
             }
             listener.onSocketStop(this);
         }
@@ -60,7 +60,7 @@ public class SocketThread extends Thread {
         try {
             socket.close();
         } catch (IOException e) {
-            listener.onSocketException(this, e);
+            e.printStackTrace();
         }
     }
 }

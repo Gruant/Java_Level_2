@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
+
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
     private static final int WIDTH = 400;
@@ -33,6 +35,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JList<String> userList = new JList<>();
     private boolean shownIoErrors = false;
     private SocketThread socketThread;
+    private Socket socket;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -59,6 +62,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         btnSend.addActionListener(this);
         tfMessage.addActionListener(this);
         btnLogin.addActionListener(this);
+        btnDisconnect.addActionListener(this);
 
         panelTop.add(tfIPAddress);
         panelTop.add(tfPort);
@@ -87,14 +91,21 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         } else if (src == btnLogin) {
             connect();
             panelTop.setVisible(false);
+        } else if (src == btnDisconnect) {
+            disconnect();
+            panelTop.setVisible(true);
         } else {
             throw new RuntimeException("Unknown source: " + src);
         }
     }
 
+    private void disconnect(){
+        socketThread.close();
+    }
+
     private void connect() {
         try {
-            Socket socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
+            socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
             socketThread = new SocketThread(this, "Client", socket);
         } catch (IOException e) {
             showException(Thread.currentThread(), e);
@@ -182,5 +193,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     @Override
     public void onSocketException(SocketThread thread, Exception exception) {
         showException(thread, exception);
+
     }
 }
