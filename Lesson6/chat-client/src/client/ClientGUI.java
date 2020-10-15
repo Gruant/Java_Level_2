@@ -86,6 +86,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             sendMessage();
         } else if (src == btnLogin) {
             connect();
+            panelTop.setVisible(false);
         } else {
             throw new RuntimeException("Unknown source: " + src);
         }
