@@ -1,5 +1,7 @@
 package client;
 
+
+import common.Library;
 import network.SocketThread;
 import network.SocketThreadListener;
 
@@ -10,11 +12,9 @@ import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
-
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
-    private static final int WIDTH = 400;
+    private static final int WIDTH = 600;
     private static final int HEIGHT = 300;
 
     private final JTextArea log = new JTextArea();
@@ -35,7 +35,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JList<String> userList = new JList<>();
     private boolean shownIoErrors = false;
     private SocketThread socketThread;
-    private Socket socket;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -57,12 +56,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 "user_with_an_exceptionally_long_name_in_this_chat"};
         userList.setListData(users);
         log.setEditable(false);
+        log.setLineWrap(true);
         scrollUser.setPreferredSize(new Dimension(150, 0));
         cbAlwaysOnTop.addActionListener(this);
         btnSend.addActionListener(this);
         tfMessage.addActionListener(this);
         btnLogin.addActionListener(this);
         btnDisconnect.addActionListener(this);
+        panelBottom.setVisible(false);
 
         panelTop.add(tfIPAddress);
         panelTop.add(tfPort);
@@ -90,22 +91,16 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             sendMessage();
         } else if (src == btnLogin) {
             connect();
-            panelTop.setVisible(false);
         } else if (src == btnDisconnect) {
-            disconnect();
-            panelTop.setVisible(true);
+            socketThread.close();
         } else {
             throw new RuntimeException("Unknown source: " + src);
         }
     }
 
-    private void disconnect(){
-        socketThread.close();
-    }
-
     private void connect() {
         try {
-            socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
+            Socket socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
             socketThread = new SocketThread(this, "Client", socket);
         } catch (IOException e) {
             showException(Thread.currentThread(), e);
@@ -114,12 +109,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     private void sendMessage() {
         String msg = tfMessage.getText();
-        String username = tfLogin.getText();
         if ("".equals(msg)) return;
         tfMessage.setText(null);
         tfMessage.grabFocus();
-        socketThread.sendMessage(msg);
-//        wrtMsgToLogFile(msg, username);
+        socketThread.sendMessage(msg); // make it work with library!
     }
 
     private void wrtMsgToLogFile(String msg, String username) {
@@ -177,12 +170,17 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     @Override
     public void onSocketStop(SocketThread thread) {
-        putLog("Stop");
+        panelBottom.setVisible(false);
+        panelTop.setVisible(true);
     }
 
     @Override
     public void onSocketReady(SocketThread thread, Socket socket) {
-        putLog("Ready");
+        panelBottom.setVisible(true);
+        panelTop.setVisible(false);
+        String login = tfLogin.getText();
+        String password = new String(tfPassword.getPassword());
+        thread.sendMessage(Library.getAuthRequest(login, password));
     }
 
     @Override
@@ -193,6 +191,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     @Override
     public void onSocketException(SocketThread thread, Exception exception) {
         showException(thread, exception);
-
     }
+
 }
+

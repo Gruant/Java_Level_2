@@ -1,10 +1,6 @@
 package network;
 
-
-import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class SocketThread extends Thread {
@@ -12,6 +8,7 @@ public class SocketThread extends Thread {
     private final SocketThreadListener listener;
     private final Socket socket;
     private DataOutputStream out;
+    DataInputStream in;
 
     public SocketThread(SocketThreadListener listener, String name, Socket socket) {
         super(name);
@@ -24,20 +21,22 @@ public class SocketThread extends Thread {
     public void run() {
         try {
             listener.onSocketStart(this, socket);
-            DataInputStream in = new DataInputStream(socket.getInputStream());
+            in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
             listener.onSocketReady(this, socket);
             while (!isInterrupted()) {
                 String msg = in.readUTF();
                 listener.onReceiveString(this, socket, msg);
             }
+        } catch (EOFException e) {
+            // i don't like this workaround
         } catch (IOException e) {
-            e.printStackTrace();
+            listener.onSocketException(this, e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                listener.onSocketException(this, e);
             }
             listener.onSocketStop(this);
         }
@@ -58,10 +57,10 @@ public class SocketThread extends Thread {
     public synchronized void close() {
         interrupt();
         try {
+            in.close();
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            listener.onSocketException(this, e);
         }
     }
 }
-
