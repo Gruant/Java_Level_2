@@ -12,11 +12,12 @@ import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
     private static final int WIDTH = 600;
     private static final int HEIGHT = 300;
-
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
     private final JTextArea log = new JTextArea();
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
 
@@ -127,12 +128,22 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }
     }
 
+    private String formatMsg(String msg){
+        String[] arr = msg.split(Library.DELIMITER);
+        if (arr[0].equals(Library.AUTH_ACCEPT)){return "Вы залогинились";}
+        if (arr[0].equals(Library.AUTH_DENIED)){return "Доступ запрещен";}
+        if (arr[0].equals(Library.MSG_FORMAT_ERROR)){return String.format("Ошибка: %s", arr[1]);}
+        if (arr[0].equals(Library.TYPE_BROADCAST)){return String.format("[%s] %s: %s", arr[1], arr[2], arr[3]);}
+        if (arr[0].equals(Library.AUTH_REQUEST)){return String.format("Login: %s, PSW: %s", arr[1], arr[2]);}
+        else {return msg;}
+    }
+
     private void putLog(String msg) {
         if ("".equals(msg)) return;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                log.append(msg + "\n");
+                log.append(formatMsg(msg) + "\n");
                 log.setCaretPosition(log.getDocument().getLength());
             }
         });
